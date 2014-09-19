@@ -40,7 +40,7 @@ GCCPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/de
 	echo "*** To turn off this error, run 'gmake GCCPREFIX= ...'." 1>&2; \
 	echo "***" 1>&2; exit 1; fi)
 endif
-
+QEMU = /usr/bin/qemu-system-i386
 # try to infer the correct QEMU
 ifndef QEMU
 QEMU := $(shell if which qemu > /dev/null; \
