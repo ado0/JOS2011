@@ -23,6 +23,17 @@ static struct Page *page_free_list;	// Free list of physical pages
 // Detect machine's physical memory setup.
 // --------------------------------------------------------------
 //this function added by me, judge the cpu whether support PSE
+#define PSE 0x8
+uint32_t is_pse()
+{
+	uint32_t pse;
+	__asm__ __volatile__(
+		"movl $1, %%eax\t\n"
+		"CPUID\t\n"
+		"andl $8,%%edx"
+		:"=d"(pse));
+	return pse;
+}
 static int
 nvram_read(int r)
 {
@@ -205,9 +216,12 @@ mem_init(void)
 	// Permissions: kernel RW, user NONE
 	// Your code goes here:
 	size = 0xffffffff - KERNBASE + 1;
-	boot_map_region(kern_pgdir, (uintptr_t)KERNBASE, size, 0, PTE_W | PTE_P);
+	if(is_pse() == PSE)
+		boot_map_region(kern_pgdir, (uintptr_t)KERNBASE, size, 0, PTE_W | PTE_P | PTE_PS);
+	else 
+		boot_map_region(kern_pgdir, (uintptr_t)KERNBASE, size, 0, PTE_W | PTE_P);
 	// Check that the initial page directory has been set up correctly.
-	check_kern_pgdir();
+//	check_kern_pgdir();
 
 	// Switch from the minimal entry page directory to the full kern_pgdir
 	// page table we just created.	Our instruction pointer should be
@@ -216,6 +230,9 @@ mem_init(void)
 	//
 	// If the machine reboots at this point, you've probably set up your
 	// kern_pgdir wrong.
+	uint32_t cr4 = rcr4();
+	cr4 |= CR4_PSE;
+	lcr4(cr4);
 	lcr3(PADDR(kern_pgdir));
 
 	check_page_free_list(0);
@@ -226,9 +243,9 @@ mem_init(void)
 	cr0 |= CR0_PE|CR0_PG|CR0_AM|CR0_WP|CR0_NE|CR0_MP;
 	cr0 &= ~(CR0_TS|CR0_EM);
 	lcr0(cr0);
-
+	
 	// Some more checks, only possible after kern_pgdir is installed.
-	check_page_installed_pgdir();
+//	check_page_installed_pgdir();
 }
 
 // --------------------------------------------------------------
@@ -412,17 +429,30 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 	// Fill this function in
 	uint32_t last;
 	pte_t* pte;
+	last = 0;
+	if(perm & PTE_PS) {
+		va = ROUNDDOWN(va, PTSIZE);
+		pa = ROUNDDOWN(pa, PTSIZE);
+		size = ROUNDUP(size, PTSIZE);
+		while(last < size) {
+			pgdir[PDX(va)] = pa | perm | PTE_P;
+			last += PTSIZE;
+			pa += PTSIZE;
+			va += PTSIZE;
+		}
+	}
+	else {
 	va = ROUNDDOWN(va, PGSIZE);
 	pa = ROUNDDOWN(pa, PGSIZE);
-	last = 0;
-	while(last < size) {
-		pte = pgdir_walk(pgdir, (void*)va, 1);
-		assert(pte != NULL);
-		*pte = pa | perm | PTE_P;
-		last += PGSIZE;
-		pa += PGSIZE;
-		va += PGSIZE;
-	}
+		while(last < size) {
+			pte = pgdir_walk(pgdir, (void*)va, 1);
+			assert(pte != NULL);
+			*pte = pa | perm | PTE_P;
+			last += PGSIZE;
+			pa += PGSIZE;
+			va += PGSIZE;
+		}
+	}	
 }
 
 //
