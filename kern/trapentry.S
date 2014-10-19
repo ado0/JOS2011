@@ -578,7 +578,7 @@ _alltraps:
 	movw %ax, %es
 	pushl %esp
 	call trap
-	call env_pop_tf 
+	//call env_pop_tf 
 
 
 
