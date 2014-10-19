@@ -410,6 +410,23 @@ load_icode(struct Env *e, uint8_t *binary, size_t size)
 	}
 	e->env_tf.tf_eip = elf->e_entry;
 */
+			
+	lcr3(PADDR(e->env_pgdir));
+	struct Elf *elf;
+	struct Proghdr *ph, *eph;
+	elf = (struct Elf *) binary;
+	ph = (struct Proghdr *)((uint8_t*)binary + elf->e_phoff);
+	eph = ph + elf->e_phnum;
+	for(; ph < eph; ph++) {
+		if(ph->p_type != ELF_PROG_LOAD)
+			continue;
+		assert(ph->p_memsz >= ph->p_filesz);
+		region_alloc(e, (void *)ph->p_va, ph->p_memsz);
+		memmove((uint8_t*)ph->p_va, (uint8_t*)binary+ph->p_offset, ph->p_filesz);
+		memset((uint8_t*)ph->p_va + ph->p_filesz, 0, ph->p_memsz - ph->p_filesz);
+	}
+	e->env_tf.tf_eip = elf->e_entry;
+
 	// Now map one page for the program's initial stack
 	// at virtual address USTACKTOP - PGSIZE.
 	// LAB 3: Your code here.
@@ -423,6 +440,7 @@ load_icode(struct Env *e, uint8_t *binary, size_t size)
 	*/
 	region_alloc(e, (void*)(USTACKTOP-PGSIZE), PGSIZE);
 //	memset((void*)(USTACKTOP-PGSIZE), 0, PGSIZE);
+	lcr3(PADDR(kern_pgdir));
 }
 
 //
@@ -558,13 +576,12 @@ env_run(struct Env *e)
 	if(curenv != NULL) {
 		if(curenv->env_status == ENV_RUNNING)
 			curenv->env_status = ENV_RUNNABLE;
-		curenv = e;
-		curenv->env_status = ENV_RUNNING;
-		curenv->env_runs++;
 	}
 	curenv = e;
-	lcr3(PADDR(e->env_pgdir));	
-	env_pop_tf(&(e->env_tf));
+	curenv->env_status = ENV_RUNNING;
+	curenv->env_runs++;
+	lcr3(PADDR(curenv->env_pgdir));	
+	env_pop_tf(&(curenv->env_tf));
 
 	panic("env_run not yet implemented");
 }
