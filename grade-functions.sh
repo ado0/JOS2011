@@ -37,7 +37,10 @@ run () {
 		qemuextra="-S -gdb tcp::$gdbport"
 	fi
 
-	qemucommand="$qemu -nographic $qemuopts -serial file:jos.out -monitor null -no-reboot $qemuextra"
+	# FIXME: try to use qemu version 13 for -monitor null not working.
+	#qemucommand="$qemu -nographic $qemuopts -serial file:jos.out -monitor null -no-reboot $qemuextra"
+	# changed to following line, origin file show no jos.out error 
+	qemucommand="$qemu -nographic $qemuopts -serial file:jos.out -no-reboot"
 	if $verbose; then
 		echo $qemucommand 1>&2
 	fi
@@ -63,7 +66,9 @@ run () {
 			echo "br *0x$brkaddr"
 			echo c
 		) > jos.in
-		gdb -batch -nx -x jos.in > /dev/null 2>&1
+		#Ben: comment 'gdb -batch ...' to avoid block long time
+		#it will take long time about 13.5s in my working environment.
+		#gdb -batch -nx -x jos.in > /dev/null 2>&1
 
 		# Make sure QEMU is dead.  On OS X, exiting gdb
 		# doesn't always exit QEMU.
