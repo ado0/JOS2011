@@ -282,7 +282,11 @@ mem_init_mp(void)
 	//     Permissions: kernel RW, user NONE
 	//
 	// LAB 4: Your code here:
-
+	int i;
+	for(i = 0; i < NCPU; i++) {
+		uintptr_t kstacktop_i = KSTACKTOP - i * (KSTKSIZE + KSTKGAP);
+		boot_map_region(kern_pgdir, kstacktop_i - KSTKSIZE, KSTKSIZE, PADDR(percpu_kstacks[i]), PTE_W);
+	}
 }
 
 // --------------------------------------------------------------
@@ -331,7 +335,7 @@ page_init(void)
 	size_t i;
 	extern char end[];
 	for(i = 0; i < npages; i++) {
-		if(i == 0) {
+		if(i == 0 || i == MPENTRY_PADDR / PGSIZE ) {
 			pages[i].pp_ref = 0;
 			continue;
 		}
@@ -655,7 +659,7 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 void
 user_mem_assert(struct Env *env, const void *va, size_t len, int perm)
 {
-	if (user_mem_check(env, va, len, perm | PTE_U) < 0) {
+	if (user_mem_check(env, va, len, perm | PTE_U | PTE_P) < 0) {
 		cprintf("[%08x] user_mem_check assertion failure for "
 			"va %08x\n", env->env_id, user_mem_check_addr);
 		env_destroy(env);	// may not return
@@ -835,15 +839,12 @@ check_kern_pgdir(void)
 	// check phys mem
 	for (i = 0; i < npages * PGSIZE; i += PGSIZE)
 		assert(check_va2pa(pgdir, KERNBASE + i) == i);
-<<<<<<< HEAD
 
 	// check IO mem (new in lab 4)
 	for (i = IOMEMBASE; i < -PGSIZE; i += PGSIZE)
 		assert(check_va2pa(pgdir, i) == i);
 
-=======
 	
->>>>>>> lab3
 	// check kernel stack
 	// (updated in lab 4 to check per-CPU kernel stacks)
 	for (n = 0; n < NCPU; n++) {
