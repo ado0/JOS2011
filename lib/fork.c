@@ -77,8 +77,8 @@ duppage(envid_t envid, unsigned pn)
 			panic("sys_page_map: %e", ret);
 		return 0;
 	} else {
-	if((ret = sys_page_map(0, (void*)addr, envid, (void*)addr, perm)) < 0)
-		panic("sys_page_map: %e", ret);
+		if((ret = sys_page_map(0, (void*)addr, envid, (void*)addr, perm)) < 0)
+			panic("sys_page_map: %e", ret);
 	}
 //	panic("duppage not implemented");
 	return 0;
