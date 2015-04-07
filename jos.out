@@ -1,0 +1,67 @@
+6828 decimal is 15254 octal!
+Physical memory: 66556K available, base = 640K, extended = 65532K
+check_page_alloc() succeeded!
+check_page() succeeded!
+check_kern_pgdir() succeeded!
+check_page_installed_pgdir() succeeded!
+SMP: CPU 0 found 1 CPU(s)
+enabled interrupts: 1 2
+FS is running
+FS can do I/O
+Device 1 presence: 1
+block cache is good
+superblock is good
+bitmap is good
+alloc_block is good
+file_open is good
+file_get_block is good
+file_flush is good
+file_truncate is good
+file rewrite is good
+icode startup
+icode: open /motd
+fs req 1 from 00001009 [page 0033f007: /motd]
+serve_open 00001009 /motd 0x0
+sending success, page d0000000
+icode: read /motd
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000400 00000200
+This is /motd, the message of the day.
+
+Welcome to the JOS kernel, now with a file system!
+
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000400 00000200
+icode: close /motd
+fs req 6 from 00001009 [page 0033f007: ]
+serve_flush 00001009 00000400
+icode: spawn /init
+fs req 1 from 00001009 [page 0033f007: /init]
+serve_open 00001009 /init 0x0
+sending success, page d0000000
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 00000200
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 00000010
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 00001000
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 00001000
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 0000018b
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 00001000
+fs req 3 from 00001009 [page 0033f007: ]
+serve_read 00001009 00000800 00000790
+fs req 6 from 00001009 [page 0033f007: ]
+serve_flush 00001009 00000800
+icode: exiting
+init: running
+init: data seems okay
+init: bss seems okay
+init: args: 'init' 'initarg1' 'initarg2'
+init: exiting
+No more runnable environments!
+Welcome to the JOS kernel monitor!
+Type 'help' for a list of commands.
+K> 
