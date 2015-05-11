@@ -220,8 +220,11 @@ trap_dispatch(struct Trapframe *tf)
 
 
 	if(tf->tf_trapno == IRQ_OFFSET + IRQ_TIMER) {
-		lapic_eoi();
-		sched_yield();
+		if (thiscpu->cpu_id == 0) {
+			lapic_eoi();
+			time_tick();
+			sched_yield();
+		}
 	}
 	// Handle processor exceptions.
 	// LAB 3: Your code here.

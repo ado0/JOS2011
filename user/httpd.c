@@ -77,7 +77,29 @@ static int
 send_data(struct http_request *req, int fd)
 {
 	// LAB 6: Your code here.
-	panic("send_data not implemented");
+	int r, len,file_size;
+	struct Stat stat;
+	uint8_t *buf;
+	
+	if ((r = fstat(fd, &stat)) < 0) {
+		die("Failed to stat");
+	}
+	file_size = stat.st_size;
+
+	buf = (uint8_t*) malloc(file_size * sizeof(uint8_t)); 
+	if(!buf) {
+		die("Failed to malloc");
+	}
+	
+	if ((len = read(fd, buf, file_size)) != file_size) {
+		die("Failed to read entire file");
+	}
+	
+	if (write(req->sock, buf, len) != len) {
+		die("Failed to send file content");
+	}
+	return 0;	
+//	panic("send_data not implemented");
 }
 
 static int
@@ -221,9 +243,25 @@ send_file(struct http_request *req)
 	// if the file does not exist, send a 404 error using send_error
 	// if the file is a directory, send a 404 error using send_error
 	// set file_size to the size of the file
+	struct Stat stat;
+	fd = open(req->url, O_RDONLY);
+	if(fd == -E_NOT_FOUND) {
+		send_error(req, 404);
+		r = fd;
+		goto end;
+	}
+	if ((r = fstat(fd, &stat)) < 0)
+		goto end;
+
+	if(stat.st_isdir) {
+		send_error(req, 404);
+		r = -1;
+		goto end;
+	}
+	file_size = stat.st_size;
 
 	// LAB 6: Your code here.
-	panic("send_file not implemented");
+//	panic("send_file not implemented");
 
 	if ((r = send_header(req, 200)) < 0)
 		goto end;

@@ -12,6 +12,7 @@
 #include <kern/console.h>
 #include <kern/sched.h>
 #include <kern/time.h>
+#include <kern/e1000.h>
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
@@ -414,9 +415,31 @@ static int
 sys_time_msec(void)
 {
 	// LAB 6: Your code here.
-	panic("sys_time_msec not implemented");
+	return time_msec();
+//	panic("sys_time_msec not implemented");
 }
-
+static int
+sys_net_transmit(void *src, size_t len)
+{
+	user_mem_assert(curenv, src, len, PTE_P | PTE_U);
+	return transmit_e1000(src, len);
+}
+static int
+sys_net_receive(void* dst)
+{
+	if((uintptr_t)dst >= UTOP)
+		return -E_INVAL;
+	return receive_e1000(dst);
+}
+static int
+sys_get_mac(uint32_t *low, uint32_t *high)
+{
+	user_mem_assert(curenv, low, sizeof(uint32_t), PTE_P | PTE_U);
+	user_mem_assert(curenv, high, sizeof(uint32_t), PTE_P | PTE_U);
+	*low = e100[E1000_RAL/sizeof(uint32_t)];
+	*high = e100[E1000_RAH/sizeof(uint32_t)] & 0x0000ffff;
+	return 0;
+}
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -455,6 +478,14 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			 return sys_ipc_recv((void*)a1);
 		case SYS_env_set_trapframe:
 			 return sys_env_set_trapframe(a1, (void*)a2);
+		case SYS_time_msec:
+			 return sys_time_msec();
+		case SYS_net_transmit:
+			 return sys_net_transmit((void*)a1, a2);
+		case SYS_net_receive:
+			 return sys_net_receive((void*)a1);
+		case SYS_get_mac:
+			 return sys_get_mac((void*)a1, (void*)a2);
 		default:
 			return -E_INVAL;
 	}

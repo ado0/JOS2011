@@ -17,6 +17,7 @@
 #include <kern/time.h>
 #include <kern/pci.h>
 
+#include <kern/e1000.h>
 static void boot_aps(void);
 
 
@@ -53,6 +54,12 @@ i386_init(void)
 	// Lab 6 hardware initialization functions
 	time_init();
 	pci_init();
+
+	// lab 6 exercise6 test code
+/*	int k;
+	char *buffer = "Across the Great Wall we can reach every corner in the world";
+	for (k = 0; k < 10; k++)
+		transmit_e1000(buffer, strlen(buffer));*/
 
 	// Acquire the big kernel lock before waking up APs
 	// Your code here:

@@ -46,7 +46,8 @@ GCCPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/de
 	echo "*** To turn off this error, run 'gmake GCCPREFIX= ...'." 1>&2; \
 	echo "***" 1>&2; exit 1; fi)
 endif
-QEMU = /usr/local/bin/qemu-system-i386
+#QEMU = /usr/local/bin/qemu-system-i386
+QEMU = /usr/local/bin/qemu-system-x86_64
 # try to infer the correct QEMU
 ifndef QEMU
 QEMU := $(shell if which qemu > /dev/null; \
@@ -151,9 +152,13 @@ IMAGES = $(OBJDIR)/kern/kernel.img
 QEMUOPTS += -smp $(CPUS)
 QEMUOPTS += -hdb $(OBJDIR)/fs/fs.img
 IMAGES += $(OBJDIR)/fs/fs.img
-QEMUOPTS += -net user -net nic,model=e1000 -redir tcp:$(PORT7)::7 \
-	   -redir tcp:$(PORT80)::80 -redir udp:$(PORT7)::7 -net dump,file=qemu.pcap
+#QEMUOPTS += -net user -net nic,model=e1000 -redir tcp:$(PORT7)::7 \
+#	   -redir tcp:$(PORT80)::80 -redir udp:$(PORT7)::7 -net dump,file=qemu.pcap
 QEMUOPTS += $(QEMUEXTRA)
+#for challenge in lab6, read mac address from EEPROM.
+#configure qemu to use a different mac address 
+QEMUOPTS += -net user -net nic,macaddr=52:54:00:12:34:60,model=e1000 -redir tcp:$(PORT7)::7 \
+	   -redir tcp:$(PORT80)::80 -redir udp:$(PORT7)::7 -net dump,file=qemu.pcap
 
 .gdbinit: .gdbinit.tmpl
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
