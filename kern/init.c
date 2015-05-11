@@ -17,6 +17,7 @@
 #include <kern/time.h>
 #include <kern/pci.h>
 
+#include <kern/e1000.h>
 static void boot_aps(void);
 
 
@@ -54,8 +55,15 @@ i386_init(void)
 	time_init();
 	pci_init();
 
+	// lab 6 exercise6 test code
+/*	int k;
+	char *buffer = "Across the Great Wall we can reach every corner in the world";
+	for (k = 0; k < 10; k++)
+		transmit_e1000(buffer, strlen(buffer));*/
+
 	// Acquire the big kernel lock before waking up APs
 	// Your code here:
+	lock_kernel();
 
 	// Starting non-boot CPUs
 	boot_aps();
@@ -79,6 +87,22 @@ i386_init(void)
 #else
 	// Touch all you want.
 	ENV_CREATE(user_icode, ENV_TYPE_USER);
+	// ENV_CREATE(net_testoutput, ENV_TYPE_USER);
+	// ENV_CREATE(user_echosrv, ENV_TYPE_USER);
+	// ENV_CREATE(user_httpd, ENV_TYPE_USER);
+	ENV_CREATE(user_writemotd, ENV_TYPE_USER);
+	ENV_CREATE(user_testfile, ENV_TYPE_USER);
+	ENV_CREATE(user_icode, ENV_TYPE_USER);
+	ENV_CREATE(user_yield, ENV_TYPE_USER);
+	ENV_CREATE(user_yield, ENV_TYPE_USER);
+	ENV_CREATE(user_yield, ENV_TYPE_USER);
+	ENV_CREATE(user_dumbfork, ENV_TYPE_USER);
+//	ENV_CREATE(user_primes, ENV_TYPE_USER);
+//	ENV_CREATE(user_hello, ENV_TYPE_USER);
+// Part A
+//	ENV_CREATE(user_divzero, ENV_TYPE_USER);
+//	ENV_CREATE(user_softint, ENV_TYPE_USER);
+//	ENV_CREATE(user_badsegment, ENV_TYPE_USER);
 #endif // TEST*
 
 	// Should not be necessary - drains keyboard because interrupt has given up.
@@ -138,9 +162,11 @@ mp_main(void)
 	// only one CPU can enter the scheduler at a time!
 	//
 	// Your code here:
+	lock_kernel();
+	sched_yield();
 
 	// Remove this after you finish Exercise 4
-	for (;;);
+//	for (;;);
 }
 
 /*

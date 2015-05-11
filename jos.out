@@ -1,0 +1,44 @@
++ ld obj/kern/kernel
++ mk obj/kern/kernel.img
+[1;256r[256;256H[6n
+Google, Inc.
+Serial Graphics Adapter 11/03/11
+SGABIOS $Id$ (pbonzini@yakj.usersys.redhat.com) Thu Nov  3 13:33:51 UTC 2011
+4 0
+[2J[m[mSeaBIOS (version pre-0.6.3-20110315_112143-titi)
+
+
+iPXE v1.0.0-591-g7aee315
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+07FC8D60+07F88D60 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+Booting from Hard Disk...
+6828 decimal is 15254 octal!
+Physical memory: 66556K available, base = 640K, extended = 65532K
+check_page_alloc() succeeded!
+check_page() succeeded!
+check_kern_pgdir() succeeded!
+check_page_installed_pgdir() succeeded!
+SMP: CPU 0 found 1 CPU(s)
+enabled interrupts: 1 2
+PCI: 00:00.0: 8086:1237: class: 6.0 (Bridge device) irq: 0
+PCI: 00:01.0: 8086:7000: class: 6.1 (Bridge device) irq: 0
+PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0
+PCI: 00:01.3: 8086:7113: class: 6.80 (Bridge device) irq: 9
+PCI: 00:02.0: 1013:00b8: class: 3.0 (Display controller) irq: 0
+PCI: 00:03.0: 8086:100e: class: 2.0 (Network controller) irq: 11
+PCI function 00:03.0 (8086:100e) enabled
+e1000 status register: 80080783
+FS is running
+FS can do I/O
+Device 1 presence: 1
+block cache is good
+superblock is good
+bitmap is good
+ns: 52:54:00:12:34:60 bound to static IP 10.0.2.15
+NS: TCP/IP initialized.
+Waiting for http connections...
+fs req 1 from 0000100a [page 03ded007: /random_file.txt]
+serve_open 0000100a /random_file.txt 0x0
+file_open failed: file or block not found
+QEMU: Terminated via GDBstub

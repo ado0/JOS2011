@@ -7,6 +7,7 @@ r = Runner(save("jos.out"),
            stop_breakpoint("readline"))
 
 def match_packet_seq(got, expect):
+    print got == [d for n, d in expect]
     s = difflib.SequenceMatcher(None, got, [d for n, d in expect])
     msgs, bad = [], False
     for tag, i1, i2, j1, j2 in s.get_opcodes():

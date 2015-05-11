@@ -9,7 +9,7 @@
 #include "fs.h"
 
 
-#define debug 0
+#define debug 1
 
 // The file system server maintains three structures
 // for each open file.
@@ -215,7 +215,16 @@ serve_read(envid_t envid, union Fsipc *ipc)
 	// Hint: Use file_read.
 	// Hint: The seek position is stored in the struct Fd.
 	// LAB 5: Your code here
-	panic("serve_read not implemented");
+	int r, count;
+	struct OpenFile *o;
+	if((r = openfile_lookup(envid, req->req_fileid, &o)) < 0)
+		return r;
+	count = (req->req_n > PGSIZE) ? PGSIZE : req->req_n; 
+	if((r = file_read(o->o_file, ret->ret_buf, count, o->o_fd->fd_offset)) < 0)
+		return r;
+	o->o_fd->fd_offset += r;
+	return r;
+	//panic("serve_read not implemented");
 }
 
 // Write req->req_n bytes from req->req_buf to req_fileid, starting at
@@ -229,7 +238,18 @@ serve_write(envid_t envid, struct Fsreq_write *req)
 		cprintf("serve_write %08x %08x %08x\n", envid, req->req_fileid, req->req_n);
 
 	// LAB 5: Your code here.
-	panic("serve_write not implemented");
+	int r, count;
+	struct OpenFile *o;
+	if((r = openfile_lookup(envid, req->req_fileid, &o)) < 0)
+		return r;
+//	count = (req->req_n > PGSIZE) ? PGSIZE : req->req_n;
+	count = req->req_n;
+//	in client side we have check count <= req_buf size;
+	if((r = file_write(o->o_file, req->req_buf, count, o->o_fd->fd_offset)) < 0)
+		return r;
+	o->o_fd->fd_offset += count;
+	return r;
+//	panic("serve_write not implemented");
 }
 
 // Stat ipc->stat.req_fileid.  Return the file's struct Stat to the

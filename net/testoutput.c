@@ -18,12 +18,16 @@ umain(int argc, char **argv)
 	binaryname = "testoutput";
 
 	output_envid = fork();
+	//cprintf("output_envid = %d\n",output_envid);
+	//cprintf("output_envid status = %d\n", envs[ENVX(output_envid)].env_status);
 	if (output_envid < 0)
 		panic("error forking");
 	else if (output_envid == 0) {
 		output(ns_envid);
 		return;
 	}
+//	cprintf("output_envid = %d\n",output_envid);
+//	cprintf("output_envid status = %d\n", envs[ENVX(output_envid)].env_status);
 
 	for (i = 0; i < TESTOUTPUT_COUNT; i++) {
 		if ((r = sys_page_alloc(0, pkt, PTE_P|PTE_U|PTE_W)) < 0)
