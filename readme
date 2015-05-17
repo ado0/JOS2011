@@ -1,0 +1,83 @@
+1 grade-functions.sh脚本有问题
+测试lab4 partA一直未通过
+
+解决: 将grade-functions保存为origin-grade-functions.sh
+然后复制MIT-6.828-Adventure下的grade-functions到当前目录下
+partA测试通过
+
+2: 不理解user/faultalloc.c
+
+第2次fault的地址是cafebffe,因此snprintf会越过页边界
+从而写下一页cafec000,因此又产生了pagefault----递归的page fault
+
+但是page fualt handler都会调用snprintf.为什么
+只输出"this string was faulted in at cafebffe"
+而不输出"this string was faulted in at cafec000"
+
+3: 下面这段代码需呀锁吗?
+Let's consider implementing a producer/consumer queue (like a pipe) that can be
+used to hold a single non-null char pointer:
+struct pcq {
+	    void *ptr;
+};
+
+void*
+pcqread(struct pcq *q)
+{
+	    void *p;
+
+		    while((p = q->ptr) == 0)
+				        ;
+			    q->ptr = 0;
+				    return p;
+}
+
+void
+pcqwrite(struct pcq *q, void *p)
+{
+	    while(q->ptr != 0)
+			        ;
+		    q->ptr = p;
+}
+我认为不需要,但是测试q->ptr的值不是原子性的,需不需要锁?
+
+优化后的版本:
+struct pcq {
+	    void *ptr;
+		struct spinlock lock;
+};
+
+void*
+pcqread(struct pcq *q)
+{
+	    void *p;
+		acquire(&q->lock);
+		while(q->ptr == 0)
+			sleep(q, &q->lock);
+		p = q->ptr;
+		q->ptr = 0;
+		wakeup(q);  /* wake pcqwrite */
+		release(&q->lock);
+		return p;
+}
+
+void
+pcqwrite(struct pcq *q, void *p)
+{
+	    acquire(&q->lock);
+		while(q->ptr != 0)
+			sleep(q, &q->lock);
+		q->ptr = p;
+		wakeup(q);  /* wake pcqread */
+		release(&q->lock);
+		return p;
+}
+
+wakeup函数需要在被锁的区域中吗?
+如果pcqread中wakeup移动到release之后,如果在
+release和wakeup之间有进程进行写(pcqwrite), 由于此时
+锁已经release,并且q->ptr已经为0.所以写进程能获取锁
+并且将q->ptr置为p然后调用wakeup(q)操作唤醒读进程. 
+
+但是挂起的q上的写进程还未唤醒,所以此时读和写进程同时会被唤醒.
+如果wakeup是在被锁的区域内,就不存在读和写进程同时被唤醒的问题.
