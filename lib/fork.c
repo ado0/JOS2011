@@ -69,7 +69,12 @@ duppage(envid_t envid, unsigned pn)
 	int perm = 0;
 	int ret;
 	perm = PTE_P | PTE_U;
-	if((vpt[pn] & PTE_COW) || (vpt[pn] & PTE_W)) {
+	if (vpt[pn] & PTE_SHARE) {
+		if ((ret = sys_page_map(0, (void*)addr, envid, (void*)addr, vpt[pn] & PTE_SYSCALL)) < 0)
+			panic("sys_page_map: %e", ret);
+		return 0;
+	}
+	if ((vpt[pn] & PTE_COW) || (vpt[pn] & PTE_W)) {
 		perm |= PTE_COW;
 		if((ret = sys_page_map(0, (void*)addr, envid, (void*)addr, perm)) < 0)
 			panic("sys_page_map: %e", ret);

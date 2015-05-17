@@ -1,7 +1,7 @@
 #include <inc/lib.h>
 
 #define BUFSIZ 1024		/* Find the buffer overrun bug! */
-int debug = 0;
+int debug = 1;
 
 
 // gettoken(s, 0) prepares gettoken for subsequent calls and returns 0.
@@ -262,6 +262,7 @@ umain(int argc, char **argv)
 
 	interactive = '?';
 	echocmds = 0;
+	cprintf("argc = %d, argv[0] = %s\n", argc, argv[0]);
 	argstart(&argc, argv, &args);
 	while ((r = argnext(&args)) >= 0)
 		switch (r) {
@@ -286,6 +287,7 @@ umain(int argc, char **argv)
 			panic("open %s: %e", argv[1], r);
 		assert(r == 0);
 	}
+	cprintf("interactive = %c\n", interactive);
 	if (interactive == '?')
 		interactive = iscons(0);
 

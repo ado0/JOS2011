@@ -86,19 +86,19 @@ i386_init(void)
 	ENV_CREATE(TEST, ENV_TYPE_USER);
 #else
 	// Touch all you want.
-	ENV_CREATE(user_icode, ENV_TYPE_USER);
+//	ENV_CREATE(user_icode, ENV_TYPE_USER);
 	// ENV_CREATE(net_testoutput, ENV_TYPE_USER);
 	// ENV_CREATE(user_echosrv, ENV_TYPE_USER);
 	// ENV_CREATE(user_httpd, ENV_TYPE_USER);
-	ENV_CREATE(user_writemotd, ENV_TYPE_USER);
-	ENV_CREATE(user_testfile, ENV_TYPE_USER);
-	ENV_CREATE(user_icode, ENV_TYPE_USER);
-	ENV_CREATE(user_yield, ENV_TYPE_USER);
-	ENV_CREATE(user_yield, ENV_TYPE_USER);
-	ENV_CREATE(user_yield, ENV_TYPE_USER);
-	ENV_CREATE(user_dumbfork, ENV_TYPE_USER);
+//	ENV_CREATE(user_writemotd, ENV_TYPE_USER);
+//	ENV_CREATE(user_testfile, ENV_TYPE_USER);
+//	ENV_CREATE(user_icode, ENV_TYPE_USER);
+//	ENV_CREATE(user_yield, ENV_TYPE_USER);
+//	ENV_CREATE(user_yield, ENV_TYPE_USER);
+//	ENV_CREATE(user_yield, ENV_TYPE_USER);
+//	ENV_CREATE(user_dumbfork, ENV_TYPE_USER);
 //	ENV_CREATE(user_primes, ENV_TYPE_USER);
-//	ENV_CREATE(user_hello, ENV_TYPE_USER);
+	ENV_CREATE(user_hello, ENV_TYPE_USER);
 // Part A
 //	ENV_CREATE(user_divzero, ENV_TYPE_USER);
 //	ENV_CREATE(user_softint, ENV_TYPE_USER);

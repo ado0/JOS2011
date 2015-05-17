@@ -217,18 +217,26 @@ trap_dispatch(struct Trapframe *tf)
 	// Be careful! In multiprocessors, clock interrupts are
 	// triggered on every CPU.
 	// LAB 6: Your code here.
-
-
-	// Handle keyboard and serial interrupts.
-	// LAB 7: Your code here.
-
-	if(tf->tf_trapno == IRQ_OFFSET + IRQ_TIMER) {
+	if (tf->tf_trapno == IRQ_OFFSET + IRQ_TIMER) {
 		if (thiscpu->cpu_id == 0) {
 			lapic_eoi();
 			time_tick();
 			sched_yield();
 		}
 	}
+
+
+	// Handle keyboard and serial interrupts.
+	// LAB 7: Your code here.
+	if (tf->tf_trapno == IRQ_OFFSET + IRQ_KBD) {
+		kbd_intr();
+		return;
+	}
+	if (tf->tf_trapno == IRQ_OFFSET + IRQ_SERIAL) {
+		serial_intr();
+		return;
+	}
+
 	// Handle processor exceptions.
 	// LAB 3: Your code here.
 	switch(tf->tf_trapno) {

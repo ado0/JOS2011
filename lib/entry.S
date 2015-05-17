@@ -31,5 +31,7 @@ _start:
 
 args_exist:
 	call libmain
+spin:
+	jmp spin
 1:	jmp 1b
 
